@@ -13,7 +13,10 @@ global tab, botNum, botCount
 
 # variables
 botChoice = 0
-botOptions = ["/html/body/div/div/main/div[2]/div/button[1]", "/html/body/div/div/main/div[2]/div/button[2]", "/html/body/div/div/main/div[2]/div/button[3]", "/html/body/div/div/main/div[2]/div/button[4]"]
+BOT_OPTIONS = ["/html/body/div/div/main/div[2]/div/button[1]", 
+                "/html/body/div/div/main/div[2]/div/button[2]", 
+                "/html/body/div/div/main/div[2]/div/button[3]", 
+                "/html/body/div/div/main/div[2]/div/button[4]"]
 user = False
 bool1 = False
 bool2 = False
@@ -22,31 +25,31 @@ tab = 0
 choice = 0
 botCount = 0
 
-def openWindow():
+def open_window():
     #open window and go to kahoot
     global tab
     
     print("Opening window...")
     driver.execute_script("window.open('');")
     driver.switch_to_window(driver.window_handles[tab])
+
     print("Navigating to Kahoot...")
     driver.get("https://kahoot.it/")
     tab += 1
 
-def enterCredentials():
+def enter_credentials():
     #enter given credentials from input values
     global botNum, botCount
 
-    openWindow()
+    open_window()
 
     # input PIN
     input1 = driver.find_element_by_id("game-input")
     print("Entering game pin...")
-
-    input1.send_keys(PIN)
+    input1.send_keys(pin)
     input1.send_keys(Keys.ENTER)
-    
     time.sleep(5) # max bots before crash against time sleep is in ratio 10 : 5
+
     input2 = driver.find_element_by_id("nickname")
     print("Entering name...")
 
@@ -60,33 +63,33 @@ def enterCredentials():
     print("Success!")
     botCount += 1
 
-def botAns():
+def bot_answer():
     #choose a random option during questions
     global botChoice
     num = random.randint(0,3)
 
     if url != "https://kahoot.it/v2/ranking":
-        botChoice = botOptions[num]
-
+        botChoice = BOT_OPTIONS[num]
         try:
             print("Picking valid answer...")
             shape = driver.find_element_by_xpath(botChoice)
             shape.send_keys(Keys.ENTER)
-
         # if question is true or false/less than 4 options
         except NoSuchElementException as exception:
             print("Repicking...")
-            botAns()
+            bot_answer()
 
 # input values
 print("")
 print("Kahoot Bot")
 print("")  
 while user == False:
-    PIN = (int(input("Enter game PIN: ")))
+    pin = (int(input("Enter game PIN: ")))
     name = input("Enter bot name: ")
+
     if len(name) > 12:
         print("Name is too long")
+
     name = str(name)
     num  = (int(input("Enter amount: ")))
     user = True
@@ -97,13 +100,13 @@ driver = webdriver.Chrome()
 # join bots
 try:
     for i in range(num): 
-        enterCredentials()
-
+        enter_credentials()
 except Exception:
     #stop any bots from joining if error occurs
     print("Login Failed")
     print("Aborting...")
     driver.close()
+    driver.quit()
 
 
 # close blank window
@@ -132,7 +135,7 @@ if bool1 == True:
         while tab != num:
             print("Switching tabs...")
             driver.switch_to_window(driver.window_handles[tab])
-            botAns()
+            bot_answer()
             tab += 1
         if driver.current_url == "https://kahoot.it/v2/getready":
             tab = 0
